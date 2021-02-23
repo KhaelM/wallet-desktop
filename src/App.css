@@ -1,5 +1,17 @@
+/* Roboto is Material's default font */
+@import url('https://fonts.googleapis.com/css2?family=Roboto&display=swap');
+
+:root {
+    --of-orange: #ED9202;
+    --of-red: #DF1078;
+    --of-blue: #2498D0;
+    --of-green: #95BD1A;
+    --of-gray: #9CAEAC;
+
+}
+
 #ResetPassword {
-    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    font-family: 'Roboto', sans-serif;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -14,6 +26,87 @@
     color: red;
 }
 
-input.invalid {
+form .form-input:last-of-type {
+    margin-bottom: 0;
+}
+
+form .form-input {
+    margin-bottom: 10px;
+}
+
+.form-input>input {
+    border: 1px solid #AEAEAE;
+    padding: 10px;
+    font-size: 20px;
+    border-radius: 5px;
+}
+
+.form-input>input:focus {
+    outline: none !important;
+    border: 1px solid var(--of-blue);
+    box-shadow: 0 0 10px #719ECE;
+}
+
+.form-input>label {
+    margin-bottom: 5px;
+}
+
+.form-input.invalid>label {
+    color: red;
+}
+
+.form-input.invalid>input {
     border: 1px solid red;
+}
+
+.form-input.vertical>* {
+    display: block;
+}
+
+/* Ripple effect from cssTricks */
+button {
+    position: relative;
+    overflow: hidden;
+    font-family: 'Roboto', sans-serif;
+    padding: 1rem 2rem;
+    font-size: 1.5rem;
+    outline: 0;
+    border: 0;
+    border-radius: 0.25rem;
+    box-shadow: 0 2px 0.5rem rgba(0, 0, 0, 0.3);
+    cursor: pointer;
+    transition: background, box-shadow ease-out 200ms;
+}
+
+button:hover {
+    box-shadow: 0 5px 0.8rem 1px rgba(0, 0, 0, 0.3);
+}
+
+@keyframes ripple {
+    to {
+        transform: scale(4);
+        opacity: 0;
+    }
+}
+
+span.ripple {
+    position: absolute;
+    border-radius: 50%;
+    transform: scale(0);
+    opacity: 1;
+    animation: ripple 600ms linear;
+    background: rgba(255, 255, 255, 0.4);
+}
+
+.full-btn {
+    width: 100%;
+}
+
+.openflex-green-bg {
+    background-color: var(--of-green);
+    color: white;
+}
+
+#modify-btn {
+    margin-top: 10px;
 }
