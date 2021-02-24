@@ -1,18 +1,19 @@
-import { Component } from 'react';
+import React from 'react';
 import logo from './openflex-logo.png';
+import Button from './Button';
 
 const errorHelper = require('./helpers/errosHelper');
 
-export default class ResetPassword extends Component {
+export default class ResetPassword extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
             newPass: '',
             confPass: '',
-            errors: {
-                newPass: [],
-                confPass: []
-            }
+            newPassErrors: [],
+            confPassErrors: [],
+            success: false,
+            errorAfterForm: false
         }
 
         this.onNewPassChange = this.onNewPassChange.bind(this);
@@ -20,93 +21,115 @@ export default class ResetPassword extends Component {
         this.modify = this.modify.bind(this);
     }
 
-    modify(event) {
+    modify(token, event) {
         event.preventDefault();
-        let errors = {
-            newPass: [],
-            confPass: []
-        };
+        let newPassErrors = [];
+        let confPassErrors = [];
 
         if (!this.state.newPass || this.state.newPass === '') {
-            errors.newPass.push(errorHelper.getAttrRequiredErr());
+            newPassErrors.push(errorHelper.getAttrRequiredErr());
         }
 
         if (!this.state.confPass || this.state.confPass === '') {
-            errors.confPass.push(errorHelper.getAttrRequiredErr());
-        }
-        if (this.state.newPass !== this.state.confPass) {
+            confPassErrors.push(errorHelper.getAttrRequiredErr());
         }
 
-        this.setState({
-            errors
-        })
+        if (this.state.confPass !== '' && (this.state.newPass !== this.state.confPass)) {
+            confPassErrors.push("Les mots de passe ne correspondent pas");
+        }
+
+        this.setState({ newPassErrors, confPassErrors });
+
+        if (!newPassErrors.length && !confPassErrors.length) {
+            const FETCH_URL = "http://localhost:3000/api/reset-password/" + token; 
+            let password = this.state.newPass;
+            fetch(FETCH_URL, {
+                method: "PATCH",
+                body: JSON.stringify({password}),
+                headers: {"Content-type": "application/json; charset=UTF-8"}})
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error("HTTP status " + response.status);
+                }
+                return response.json();
+            }) 
+            .then(json => this.setState({success: true}))
+            .catch(err => {
+                this.setState({
+                    errorAfterForm: true
+                })
+            });
+        }
     }
 
     onNewPassChange(event) {
         this.setState({
-            newPass: event.target.value
+            newPass: event.target.value,
+            newPassErrors: [],
+            confPassErrors: []
         })
     }
 
     onConfPassChange(event) {
         this.setState({
             confPass: event.target.value,
+            newPassErrors: [],
+            confPassErrors: []
         })
     }
 
-    createRipple(event) {
-        const button = event.currentTarget;
-
-        const circle = document.createElement("span");
-        const diameter = Math.max(button.clientWidth, button.clientHeight);
-        const radius = diameter / 2;
-
-        circle.style.width = circle.style.height = `${diameter}px`;
-        circle.style.left = `${event.clientX - (button.offsetLeft + radius)}px`;
-        circle.style.top = `${event.clientY - (button.offsetTop + radius)}px`;
-        circle.classList.add("ripple");
-
-        const ripple = button.getElementsByClassName("ripple")[0];
-
-        if (ripple) {
-            ripple.remove();
+    render() {
+        const { search } = window.location;
+        const params = new URLSearchParams(search);
+        let token = params.get('token');
+        if(!token) {
+            return (<h1>Vous n'avez pas accès à cette page!</h1>);
         }
 
-        button.appendChild(circle);
-    }
+        const successOrForm = () => {
+            if(this.state.success) {
+                return (<div className="success">Votre mot de passe a bien été modifié</div>);
+            } else {
+                return (
+                        <form onSubmit={(e) => this.modify(token, e)}>
+                            <div className={this.state.newPassErrors.length ? "form-input vertical invalid" : "form-input vertical"} >
+                                <label htmlFor="new-password">Nouveau mot de passe</label>
+                                <input onChange={this.onNewPassChange} id="new-password" name="new-password" type="password" />
+                                <div className="validation-errors">
+                                    {this.state.newPassErrors.map((error, index) => {
+                                        return (
+                                            <div key={index}><small>{error}</small></div>
+                                        )
+                                    })}
+                                </div>
+                            </div>
+                            <div className={this.state.confPassErrors.length ? "form-input vertical invalid" : "form-input vertical"}>
+                                <label htmlFor="confirm-password">Confirmer mot de passe</label>
+                                <input onChange={this.onConfPassChange} id="confirm-password" name="confirm-password" type="password" />
+                                <div className="validation-errors">
+                                    {this.state.confPassErrors.map((error, index) => {
+                                        return (
+                                            <div key={index}><small>{error}</small></div>
+                                        )
+                                    })}
+                                </div>
+                            </div>
+                            <Button id="modify-btn" className="full-btn openflex-green-bg" type="submit" value="Modifier" />
+                        </form>
+                );
+            }
+        }
 
-    render() {
         return (
             <div id="ResetPassword">
                 <div>
                     <img src={logo} alt="Openflex Logo" />
                 </div>
-                <h1>Wali</h1>
-                <form onSubmit={this.modify}>
-                    <div className={this.state.errors.newPass.length ? "form-input vertical invalid" : "form-input vertical"} >
-                        <label htmlFor="new-password">Nouveau mot de passe</label>
-                        <input onChange={this.onNewPassChange} id="new-password" name="new-password" type="password" />
-                        <div className="validation-errors">
-                            {this.state.errors.newPass.map((error, index) => {
-                                return (
-                                    <small key={index}>{error}</small>
-                                )
-                            })}
-                        </div>
-                    </div>
-                    <div className={this.state.errors.confPass.length ? "form-input vertical invalid" : "form-input vertical"}>
-                        <label htmlFor="confirm-password">Confirmer mot de passe</label>
-                        <input onChange={this.onConfPassChange} id="confirm-password" name="confirm-password" type="password" />
-                        <div className="validation-errors">
-                            {this.state.errors.confPass.map((error, index) => {
-                                return (
-                                    <small key={index}>{error}</small>
-                                )
-                            })}
-                        </div>
-                    </div>
-                    <button id="modify-btn" onClick={this.createRipple} className="full-btn openflex-green-bg" type="submit">Modifier</button>
-                </form>
+                <h1>Walli</h1>
+                {this.state.errorAfterForm ?
+                    <div className="error">Lien invalide ou expiré. Veuillez reprendre la procédure de réinitialisation de mot de passe depuis le début pour recevoir un nouveau mail.</div>:
+                    successOrForm()
+                }
             </div>
         );
     }
