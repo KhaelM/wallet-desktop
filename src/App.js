@@ -10,14 +10,16 @@ import NotFound from './NotFound';
 
 import './App.css';
 
+const { PUBLIC_URL } = process.env;
+
 export default function App() {
   return (
     <Router>
       <Switch>
-        <Route path="/reset-password">
+        <Route path={PUBLIC_URL + "/reset-password"}>
           <ResetPassword />
         </Route>
-        <Route exact path="/">
+        <Route exact path={PUBLIC_URL + "/"}>
           <Home />
         </Route>
         <Route>

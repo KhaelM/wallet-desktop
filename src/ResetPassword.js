@@ -3,6 +3,7 @@ import logo from './openflex-logo.png';
 import Button from './Button';
 
 const errorHelper = require('./helpers/errosHelper');
+const {PUBLIC_URL} = process.env
 
 export default class ResetPassword extends React.Component {
     constructor(props) {
@@ -41,7 +42,7 @@ export default class ResetPassword extends React.Component {
         this.setState({ newPassErrors, confPassErrors });
 
         if (!newPassErrors.length && !confPassErrors.length) {
-            const FETCH_URL = "http://localhost:3000/api/reset-password/" + token; 
+            const FETCH_URL = PUBLIC_URL + "/api/reset-password/" + token; 
             let password = this.state.newPass;
             fetch(FETCH_URL, {
                 method: "PATCH",
