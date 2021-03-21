@@ -126,7 +126,7 @@ export default class ResetPassword extends React.Component {
                 <div>
                     <img src={logo} alt="Openflex Logo" />
                 </div>
-                <h1>Walli</h1>
+                <h1>OpenWallet</h1>
                 {this.state.errorAfterForm ?
                     <div className="error">Lien invalide ou expiré. Veuillez reprendre la procédure de réinitialisation de mot de passe depuis le début pour recevoir un nouveau mail.</div>:
                     successOrForm()
